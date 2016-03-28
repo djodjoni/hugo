@@ -1,0 +1,48 @@
+import org.aspectj.bridge.IMessage
+import org.aspectj.bridge.MessageHandler
+import org.aspectj.tools.ajc.Main
+
+apply plugin: 'java'
+
+compileJava {
+    sourceCompatibility = "1.7"
+    targetCompatibility = "1.7"
+
+    doLast {
+        String[] args = [
+                "-showWeaveInfo",
+                "-1.5",
+                "-inpath", destinationDir.toString(),
+                "-aspectpath", classpath.asPath,
+                "-d", destinationDir.toString(),
+                "-classpath", classpath.asPath,
+        ]
+
+        MessageHandler handler = new MessageHandler(true);
+        new Main().run(args, handler)
+
+        def log = project.logger
+        for (IMessage message : handler.getMessages(null, true)) {
+            switch (message.getKind()) {
+                case IMessage.ABORT:
+                case IMessage.ERROR:
+                case IMessage.FAIL:
+                    log.error message.message, message.thrown
+                    break;
+                case IMessage.WARNING:
+                case IMessage.INFO:
+                    log.info message.message, message.thrown
+                    break;
+                case IMessage.DEBUG:
+                    log.debug message.message, message.thrown
+                    break;
+            }
+        }
+    }
+}
+
+dependencies {
+    compile project(':hugo-annotations')
+    compile 'org.aspectj:aspectjrt:1.8.6'
+    compile 'org.aspectj:aspectjtools:1.8.6'
+}

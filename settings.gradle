@@ -1,3 +1,4 @@
-include ':hugo-annotations'
+include ':hugo-annotations', ':hugo-java', ':example-java'
 include ':hugo-plugin'
 include ':hugo-runtime'
+//include ':hugo-example'
